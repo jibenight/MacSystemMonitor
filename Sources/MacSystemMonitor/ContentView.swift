@@ -111,6 +111,9 @@ private struct SectionLabel: View {
 /// Contenu du menu déroulant.
 struct ContentView: View {
     @ObservedObject var monitor: SystemMonitor
+    /// En mode capture, les contrôles interactifs sont remplacés par un visuel statique
+    /// (ImageRenderer ne rend pas correctement Toggle/Button hors écran).
+    var screenshotMode = false
 
     private var snap: SystemSnapshot { monitor.snapshot }
 
@@ -212,26 +215,40 @@ struct ContentView: View {
 
             // Pied : démarrage auto + quitter
             HStack {
-                Toggle(isOn: Binding(
-                    get: { LoginItem.isEnabled },
-                    set: { LoginItem.set($0) }
-                )) {
+                if screenshotMode {
                     Text("Lancer au démarrage")
                         .font(.system(size: 11))
-                }
-                .toggleStyle(.switch)
-                .controlSize(.mini)
-
-                Spacer()
-
-                Button {
-                    NSApplication.shared.terminate(nil)
-                } label: {
+                    // Faux interrupteur statique (off)
+                    Capsule()
+                        .fill(Color.primary.opacity(0.15))
+                        .frame(width: 26, height: 15)
+                        .overlay(Circle().fill(.white).padding(1.5), alignment: .leading)
+                    Spacer()
                     Text("Quitter")
                         .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                } else {
+                    Toggle(isOn: Binding(
+                        get: { LoginItem.isEnabled },
+                        set: { LoginItem.set($0) }
+                    )) {
+                        Text("Lancer au démarrage")
+                            .font(.system(size: 11))
+                    }
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+
+                    Spacer()
+
+                    Button {
+                        NSApplication.shared.terminate(nil)
+                    } label: {
+                        Text("Quitter")
+                            .font(.system(size: 11))
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.borderless)
-                .foregroundStyle(.secondary)
             }
         }
         .padding(16)

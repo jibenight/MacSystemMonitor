@@ -15,6 +15,13 @@ Dans la barre de menu : `🖥️ CPU 23%  RAM 68%`
 Au clic, un menu déroulant détaille toutes les métriques avec des jauges colorées,
 un mini-graphique d'historique et le top des processus.
 
+<p align="center">
+  <img src="screenshot.png" width="320" alt="Capture du menu déroulant">
+  <br>
+  <em>Le menu déroulant : historique CPU (orange) / RAM (bleu), jauge CPU et détail par cœur,
+  mémoire, SSD, débit réseau, top des processus, batterie et interrupteur de démarrage.</em>
+</p>
+
 ## Fonctionnalités
 
 - 📊 **Historique** CPU + RAM (mini-graphique 60 s, Swift Charts)

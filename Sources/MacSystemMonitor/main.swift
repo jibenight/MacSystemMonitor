@@ -12,6 +12,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         // App d'arrière-plan : pas d'icône dans le Dock.
         NSApp.setActivationPolicy(.accessory)
 
+        // Mode capture : rend l'UI avec des données d'exemple puis quitte.
+        if CommandLine.arguments.contains("--screenshot") {
+            runScreenshotMode()
+            return
+        }
+
         // Icône / texte dans la barre de menu.
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
@@ -43,6 +49,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             .store(in: &cancellables)
 
         monitor.start()
+    }
+
+    /// Rend l'interface (données d'exemple) dans un PNG, puis quitte.
+    private func runScreenshotMode() {
+        let outPath = CommandLine.arguments.last.flatMap { $0.hasSuffix(".png") ? $0 : nil } ?? "screenshot.png"
+        monitor.loadSampleData()
+        // Après un tour de run loop pour laisser SwiftUI/Charts effectuer une passe de rendu.
+        DispatchQueue.main.async {
+            let view = ContentView(monitor: self.monitor, screenshotMode: true)
+                .background(Color(nsColor: .windowBackgroundColor))
+            let renderer = ImageRenderer(content: view)
+            renderer.scale = 2
+            if let image = renderer.nsImage,
+               let tiff = image.tiffRepresentation,
+               let rep = NSBitmapImageRep(data: tiff),
+               let png = rep.representation(using: .png, properties: [:]) {
+                try? png.write(to: URL(fileURLWithPath: outPath))
+                print("✅ Capture écrite : \(outPath)")
+            } else {
+                FileHandle.standardError.write("Échec du rendu\n".data(using: .utf8)!)
+            }
+            NSApp.terminate(nil)
+        }
     }
 
     private func updateTitle(_ snap: SystemSnapshot) {
