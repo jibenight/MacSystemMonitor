@@ -12,3 +12,6 @@ Package.resolved
 # Xcode (si ouvert un jour)
 *.xcodeproj/xcuserdata/
 DerivedData/
+
+# Artefacts de release
+*.zip
