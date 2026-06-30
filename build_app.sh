@@ -17,6 +17,11 @@ mkdir -p "$BUNDLE/Contents/Resources"
 
 cp ".build/release/$BIN" "$BUNDLE/Contents/MacOS/$BIN"
 
+# Icône (générée par make_icon.swift → AppIcon.icns)
+if [ -f "AppIcon.icns" ]; then
+    cp "AppIcon.icns" "$BUNDLE/Contents/Resources/AppIcon.icns"
+fi
+
 cat > "$BUNDLE/Contents/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -28,6 +33,7 @@ cat > "$BUNDLE/Contents/Info.plist" <<EOF
     <key>CFBundleVersion</key><string>1.0</string>
     <key>CFBundleShortVersionString</key><string>1.0</string>
     <key>CFBundleExecutable</key><string>$BIN</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <!-- App d'arrière-plan : pas d'icône dans le Dock -->

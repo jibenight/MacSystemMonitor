@@ -15,3 +15,7 @@ DerivedData/
 
 # Artefacts de release
 *.zip
+
+# Fichiers intermédiaires de génération d'icône
+icon_1024.png
+AppIcon.iconset/
