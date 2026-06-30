@@ -1,7 +1,13 @@
-# Moniteur Système (macOS)
+<p align="center">
+  <img src="icon.png" width="160" alt="Icône Moniteur Système">
+</p>
 
-Outil de monitoring système natif pour Mac, écrit en **Swift** (AppKit + SwiftUI).
-Affiche en temps réel dans la barre de menu : **CPU, mémoire, SSD, réseau et batterie**.
+<h1 align="center">Moniteur Système (macOS)</h1>
+
+<p align="center">
+  Outil de monitoring système natif pour Mac, écrit en <b>Swift</b> (AppKit + SwiftUI).<br>
+  Affiche en temps réel dans la barre de menu : <b>CPU, mémoire, SSD, réseau et batterie</b>.
+</p>
 
 ## Aperçu
 
@@ -59,7 +65,17 @@ Sources/MacSystemMonitor/
 ├── SystemMonitor.swift # Modèle observable + rafraîchissement adaptatif + historique
 ├── LoginItem.swift     # Lancement au démarrage (SMAppService)
 └── ContentView.swift   # Interface SwiftUI du menu déroulant
+
+make_icon.swift         # Génère l'icône (AppIcon.icns) via AppKit/CoreGraphics
+build_app.sh            # Compile + empaquette l'app (.app) avec l'icône
 ```
+
+## Icône
+
+L'icône est générée par code (pas d'éditeur d'image) : `swift make_icon.swift` rend
+le symbole `gauge.with.dots.needle.67percent` en blanc sur un dégradé bleu→violet, puis
+`sips` + `iconutil` produisent `AppIcon.icns`. Modifie le symbole ou les couleurs
+directement dans `make_icon.swift` pour personnaliser.
 
 ## Personnalisation rapide
 
