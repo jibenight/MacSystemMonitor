@@ -111,6 +111,7 @@ private struct SectionLabel: View {
 /// Contenu du menu déroulant.
 struct ContentView: View {
     @ObservedObject var monitor: SystemMonitor
+    @ObservedObject var prefs = Preferences.shared
     /// En mode capture, les contrôles interactifs sont remplacés par un visuel statique
     /// (ImageRenderer ne rend pas correctement Toggle/Button hors écran).
     var screenshotMode = false
@@ -209,6 +210,27 @@ struct ContentView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+            }
+
+            // Réglages (masqués sur la capture d'écran : contrôles interactifs)
+            if !screenshotMode {
+                Divider()
+                SectionLabel(text: "Réglages")
+                HStack(spacing: 12) {
+                    Text("Barre de menu :")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Toggle("CPU", isOn: $prefs.showCPUInMenuBar)
+                        .toggleStyle(.checkbox)
+                        .font(.system(size: 11))
+                    Toggle("RAM", isOn: $prefs.showRAMInMenuBar)
+                        .toggleStyle(.checkbox)
+                        .font(.system(size: 11))
+                    Spacer()
+                }
+                Toggle("Alertes (CPU, mémoire, SSD élevés)", isOn: $prefs.alertsEnabled)
+                    .toggleStyle(.checkbox)
+                    .font(.system(size: 11))
             }
 
             Divider()

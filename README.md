@@ -9,6 +9,15 @@
   Affiche en temps réel dans la barre de menu : <b>CPU, mémoire, SSD, réseau et batterie</b>.
 </p>
 
+<p align="center">
+  <a href="https://github.com/jibenight/MacSystemMonitor/actions/workflows/build.yml">
+    <img src="https://github.com/jibenight/MacSystemMonitor/actions/workflows/build.yml/badge.svg" alt="Build">
+  </a>
+  <a href="https://github.com/jibenight/MacSystemMonitor/releases/latest">
+    <img src="https://img.shields.io/github/v/release/jibenight/MacSystemMonitor" alt="Release">
+  </a>
+</p>
+
 ## Aperçu
 
 Dans la barre de menu : `🖥️ CPU 23%  RAM 68%`
@@ -28,6 +37,8 @@ un mini-graphique d'historique et le top des processus.
 - 🧮 **Détail par cœur** CPU
 - 📈 **CPU, mémoire, SSD, réseau ↑/↓, batterie** en temps réel
 - 🔥 **Top 5 des processus** les plus gourmands (CPU/RAM)
+- 🔔 **Alertes natives** : CPU > 90 % soutenu, mémoire > 92 %, SSD > 90 % (anti-spam 15 min)
+- ⚙️ **Barre de menu personnalisable** : afficher CPU, RAM, les deux ou l'icône seule
 - 🚀 **Lancer au démarrage** (interrupteur intégré, `SMAppService`)
 - 🪶 **Léger** : ~45 Mo de RAM, ~1 % CPU — cadence adaptative (3 s fermé / 1,5 s ouvert)
 
@@ -70,6 +81,8 @@ Sources/MacSystemMonitor/
 ├── Metrics.swift       # Collecte bas-niveau (Mach / IOKit / FS)
 ├── Processes.swift     # Top des processus via libproc (%CPU instantané, RAM)
 ├── SystemMonitor.swift # Modèle observable + rafraîchissement adaptatif + historique
+├── Preferences.swift   # Préférences persistantes (UserDefaults)
+├── Alerts.swift        # Alertes de seuil (UserNotifications)
 ├── LoginItem.swift     # Lancement au démarrage (SMAppService)
 └── ContentView.swift   # Interface SwiftUI du menu déroulant
 
@@ -83,6 +96,15 @@ L'icône est générée par code (pas d'éditeur d'image) : `swift make_icon.swi
 le symbole `gauge.with.dots.needle.67percent` en blanc sur un dégradé bleu→violet, puis
 `sips` + `iconutil` produisent `AppIcon.icns`. Modifie le symbole ou les couleurs
 directement dans `make_icon.swift` pour personnaliser.
+
+## Publier une release
+
+La CI (GitHub Actions) compile à chaque push et **crée automatiquement une release**
+avec le `.zip` de l'app quand on pousse un tag :
+
+```bash
+git tag v1.1 && git push origin v1.1
+```
 
 ## Personnalisation rapide
 

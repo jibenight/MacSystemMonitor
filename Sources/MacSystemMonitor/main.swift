@@ -6,6 +6,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private let monitor = SystemMonitor()  // 3 s fermé / 1,5 s ouvert
+    private let alerts = AlertEngine()
+    private var lastSnapshot = SystemSnapshot()
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -40,14 +42,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         host.sizingOptions = [.preferredContentSize]
         popover.contentViewController = host
 
-        // Met à jour le texte de la barre de menu à chaque échantillon.
+        // Met à jour le texte de la barre de menu et vérifie les seuils à chaque échantillon.
         monitor.$snapshot
             .receive(on: RunLoop.main)
             .sink { [weak self] snap in
+                self?.lastSnapshot = snap
                 self?.updateTitle(snap)
+                self?.alerts.check(snap)
             }
             .store(in: &cancellables)
 
+        // Ré-applique le titre quand les préférences d'affichage changent.
+        Preferences.shared.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                DispatchQueue.main.async { self?.updateTitle(self?.lastSnapshot ?? SystemSnapshot()) }
+            }
+            .store(in: &cancellables)
+
+        alerts.requestAuthorization()
         monitor.start()
     }
 
@@ -76,7 +89,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     private func updateTitle(_ snap: SystemSnapshot) {
         guard let button = statusItem.button else { return }
-        button.title = " CPU \(Fmt.percent(snap.cpuUsage))  RAM \(Fmt.percent(snap.memUsedRatio))"
+        let prefs = Preferences.shared
+        var parts: [String] = []
+        if prefs.showCPUInMenuBar { parts.append("CPU \(Fmt.percent(snap.cpuUsage))") }
+        if prefs.showRAMInMenuBar { parts.append("RAM \(Fmt.percent(snap.memUsedRatio))") }
+        // Si tout est décoché, seule l'icône reste.
+        button.title = parts.isEmpty ? "" : " " + parts.joined(separator: "  ")
     }
 
     @objc private func togglePopover(_ sender: Any?) {

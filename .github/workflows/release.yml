@@ -1,0 +1,32 @@
+name: Release
+
+# Pousser un tag `vX.Y` crée automatiquement la release GitHub
+# avec le .zip de l'app en téléchargement :
+#   git tag v1.1 && git push origin v1.1
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compiler et empaqueter
+        run: ./build_app.sh
+
+      - name: Compresser le bundle
+        run: ditto -c -k --sequesterRsrc --keepParent "Moniteur Système.app" MoniteurSysteme.app.zip
+
+      - name: Créer la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "MoniteurSysteme.app.zip#Moniteur Système.app (macOS 13+)" \
+            --title "Moniteur Système $GITHUB_REF_NAME" \
+            --generate-notes
